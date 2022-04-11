@@ -86,14 +86,14 @@ class App extends Component {
             <Route exact path="/" element={<Main/>}></Route>
 
             <Route exact path='/chat'
-            element={<PrivateRoute path="/chat" authenticated={this.state.authenticated} component={Chatter}></PrivateRoute>}>
+            element={<PrivateRoute authenticated={this.state.authenticated} component={Chatter}></PrivateRoute>}>
             </Route>
 
             <Route exact path='/signup'
-            element={<PublicRoute path="/signup" authenticated={this.state.authenticated} component={SignUp}></PublicRoute>}>
+            element={<PublicRoute  authenticated={this.state.authenticated} component={SignUp}></PublicRoute>}>
           </Route>
 
-          <Route exact path='/login' element={<PublicRoute path="/login" authenticated={this.state.authenticated} component={Login}></PublicRoute>}>
+          <Route exact path='/login' element={<PublicRoute  authenticated={this.state.authenticated} component={Login}></PublicRoute>}>
             
           </Route>
             

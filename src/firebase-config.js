@@ -16,7 +16,9 @@ const config = {
 
   messagingSenderId: "907787447579",
 
-  appId: "1:907787447579:web:edc13fe2919794622bb7be"
+  appId: "1:907787447579:web:edc13fe2919794622bb7be",
+
+  databaseURL: "https://testfront-ferresofka-default-rtdb.firebaseio.com/"
 
 };
 
