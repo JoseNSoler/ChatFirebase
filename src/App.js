@@ -1,21 +1,47 @@
-import { BrowserRouter as Router, Route, Navigate, Routes } from 'react-router-dom';
 import React, { Component } from 'react';
+import Login from './components/Login'
+import SignUp from './components/SignUp'
+import Main from './Main'
+import Chatter from './components/Chatter'
+import {
+  Route,
+  BrowserRouter as Router,
+  Switch,
+  Navigate,
+  Routes,
+} from "react-router-dom";
+
 import { auth } from './firebase-config';
 
-//Pages
 
-import Signup from './components/SignUp';
-import Login from './components/Login';
-import Chatter from './components/Chatter';
+import 'bootstrap/dist/css/bootstrap.min.css';
 
-function PrivateRoute({ user, children }) {
-  if(!user){
-    return <Navigate to="/login" replace></Navigate>
-  }
-  return <Chatter/>;
+
+function PrivateRoute({ component: Component, authenticated, ...rest }) {
+  return(
+    authenticated === true
+    ? <Component />
+    : <Navigate to={{ pathname: '/login'} }/>
+  )
+  return(
+    <Component/>
+  )
+  return (
+    <Route
+      {...rest}
+      render={(props) => authenticated === true
+        ? <Component {...props} />
+        : <Navigate to={{ pathname: '/login', state: { from: props.location } }} />}
+    />
+  )
 }
 
 function PublicRoute({ component: Component, authenticated, ...rest }) {
+  return (
+    authenticated === false ?
+    <Component/>
+    : <Navigate to='/chat' />
+  )
   return (
     <Route
       {...rest}
@@ -27,42 +53,55 @@ function PublicRoute({ component: Component, authenticated, ...rest }) {
 }
 
 class App extends Component {
-  constructor(props) {
-    super(props);
+  constructor() {
+    super();
     this.state = {
       authenticated: false,
-      loading: true
-    }
+      loading: true,
+    };
   }
 
   componentDidMount() {
     auth.onAuthStateChanged((user) => {
-      if (user) {
+      if (!user) {
         this.setState({
-          authenticated: true,
-          loading: false
+          authenticated: false,
+          loading: false,
         });
       } else {
         this.setState({
-          authenticated: false,
-          loading: false
+          authenticated: true,
+          loading: false,
         });
       }
     })
   }
 
+
   render() {
     return this.state.loading === true ? <h2>Loading...</h2> : (
-      <Router>
-        <Routes>
-          <Route exact path='/chat' element={<PrivateRoute authenticated={this.state.authenticated}/>}>
+      <div className="container">
+        <Router>
+          <Routes>
+            <Route exact path="/" element={<Main/>}></Route>
+
+            <Route exact path='/chat'
+            element={<PrivateRoute path="/chat" authenticated={this.state.authenticated} component={Chatter}></PrivateRoute>}>
+            </Route>
+
+            <Route exact path='/signup'
+            element={<PublicRoute path="/signup" authenticated={this.state.authenticated} component={SignUp}></PublicRoute>}>
+          </Route>
+
+          <Route exact path='/login' element={<PublicRoute path="/login" authenticated={this.state.authenticated} component={Login}></PublicRoute>}>
             
           </Route>
-          <Route path="/signup" element={<Signup/>}></Route>
-          <Route path="/login"  element={<Login/>}></Route>
-          <Route path="/"  element={<><h1>assadsadsda</h1></>}></Route>
-        </Routes>
-      </Router>
+            
+        
+          </Routes>
+        </Router>
+      </div>
+
     );
   }
 
