@@ -22,6 +22,14 @@ export default class Chatter extends Component {
         this.handleSubmit = this.handleSubmit.bind(this);
     }
     async componentDidMount() {
+        const ref = db.ref('chats');
+
+        ref.on('value', (snapshot) => {
+            console.log(snapshot.val());
+          }, (errorObject) => {
+            console.log('The read failed: ' + errorObject.name);
+          });
+          
         
         this.setState({ readError: null });
         try {
@@ -35,7 +43,7 @@ export default class Chatter extends Component {
         } catch (error) {
             this.setState({ readError: error.message });
         }
-        console.log(db)
+        console.log(db.ref("chats"))
     }
 
     handleChange(event) {

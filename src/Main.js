@@ -10,7 +10,7 @@ export default class Main extends Component {
         return (
             <div>
                 <NavBar />
-                <div class="jumbotron" className="container center">
+                <div className="container center">
                     sadasdasd
                     <Container>
                         <hr className='my-2' />
