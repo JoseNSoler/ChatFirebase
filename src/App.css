@@ -74,6 +74,15 @@ form button {
   width: 20%;
   background-color: rgb(66, 66, 190);
 }
+.staticFormForm{
+  position: relative;
+}
+
+
+.staticForm{
+  position: absolute;
+  top: 96px;
+}
 
 .buttonRegister{
   height: 150px;

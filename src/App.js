@@ -48,7 +48,7 @@ function App() {
   return (
     <div className="App">
       <header>
-        <h1>{user ? user.displayName : " no hay usuairo"}</h1>
+        <h1>{user ? user.email : " no hay usuairo"}</h1>
         <><SignOut/></>
         
       </header>
@@ -129,6 +129,27 @@ function SignUp() {
 }
 
 function SignIn() {
+  const [email, setemail] = useState("");
+  const [pass, setpass] = useState("");
+  
+
+  const  handleSubmit = (event) => {
+    event.preventDefault();
+  }
+
+  const handleChange = (event) => {
+    switch (event.target.name) {
+      case "email":
+        setemail(event.target.value)
+        break;
+      case "password":
+        setpass(event.target.value)
+        break;
+      default:
+        break;
+    }
+  }
+
 
 
   const signInWithGoogle = () => {
@@ -143,15 +164,40 @@ function SignIn() {
     auth.signInWithPopup(provider);
   }
 
+  const signInWithEmail = () => {
+    console.log(auth)
+    const credential = firebase.auth.EmailAuthProvider.credential(email, pass);
+    auth.signInWithCredential(credential)
+  }
 
 
-  return(<>
+
+  return(
+  <div>
+    <div className='staticForm'>
+      
+      <button onClick={signInWithEmail}>Sign in with ytour email</button>
+      <Form className='staticFormForm'>
+        <Form.Group>
+          <Col>
+            <Form.Control id="form-input" placeholder="Email" name="email" type="email" onChange={(e) => {handleChange(e)}} value={email} required />
+            
+          </Col>
+        </Form.Group>
+        <Form.Group>
+          <Col>
+            <Form.Control id="form-input" placeholder="Password" name="password" style={{margin: "0 0 0 52px"}} onChange={(e) => {handleChange(e)}} value={pass} type="password" required/>
+          </Col>
+        </Form.Group>
+      </Form>
+      
+    </div>
       <button onClick={signInWithGithub}>Sign in with Github</button>
       <button onClick={signInWithGoogle}>Sign in with Google</button>
       <>No tienes usuario?</>
       <SignUp/>
       
-      </>
+  </div>
 
   )
 }

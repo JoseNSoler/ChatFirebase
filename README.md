@@ -1,7 +1,13 @@
-# Chat firebase
+# Chat firebase - Auth por Google, email, github
+
+
 
 <p align="center">
 <img src="https://www.sofka.com.co/wp-content/uploads/2021/02/sofkau-logo-horizontal.png">
+</p>
+
+<p align="center">
+<img src="https://user-images.githubusercontent.com/59320487/163166542-62eafaa3-eaca-4b4e-b3fb-4963fe34d817.png">
 </p>
 
 <p align="center">
@@ -15,6 +21,7 @@
 <p align="center">
 <img src="https://user-images.githubusercontent.com/59320487/163161621-db723d4e-bd30-4402-96ec-bd8f3176c76f.png">
 </p>
+
 
 
 
