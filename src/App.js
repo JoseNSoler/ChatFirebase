@@ -1,110 +1,146 @@
-import React, { Component } from 'react';
-import Login from './components/Login'
-import SignUp from './components/SignUp'
-import Main from './Main'
-import Chatter from './components/Chatter'
-import {
-  Route,
-  BrowserRouter as Router,
-  Switch,
-  Navigate,
-  Routes,
-} from "react-router-dom";
+import React, { useRef, useState } from 'react';
+import './App.css';
 
-import { auth } from './firebase-config';
+import { useAuthState } from 'react-firebase-hooks/auth';
+import { useCollectionData } from 'react-firebase-hooks/firestore';
+
+import firebase from 'firebase/compat/app';
+import 'firebase/compat/auth';
+import 'firebase/compat/firestore';
 
 
-import 'bootstrap/dist/css/bootstrap.min.css';
+const firebaseConfig = {
+  apiKey: "AIzaSyA5PQ9zKM8vVYzO0rFsQRmrILdLehFktGA",
 
+  authDomain: "testfront-ferresofka.firebaseapp.com",
 
-function PrivateRoute({ component: Component, authenticated, ...rest }) {
-  return(
-    authenticated === true
-    ? <Component />
-    : <Navigate to={{ pathname: '/login'} }/>
-  )
-  return(
-    <Component/>
-  )
-  return (
-    <Route
-      {...rest}
-      render={(props) => authenticated === true
-        ? <Component {...props} />
-        : <Navigate to={{ pathname: '/login', state: { from: props.location } }} />}
-    />
-  )
+  databaseURL: "https://testfront-ferresofka-default-rtdb.firebaseio.com",
+
+  projectId: "testfront-ferresofka",
+
+  storageBucket: "testfront-ferresofka.appspot.com",
+
+  messagingSenderId: "134262825428",
+
+  appId: "1:134262825428:web:178678e76a3a11fef83641"
+
 }
 
-function PublicRoute({ component: Component, authenticated, ...rest }) {
+const firebaseApp = firebase.initializeApp(firebaseConfig)
+
+const auth = firebase.auth();
+const firestore = firebase.firestore();
+
+
+
+function App() {
+
+
+  const [user] = useAuthState(auth);
+
+  console.log(user)
+
   return (
-    authenticated === false ?
-    <Component/>
-    : <Navigate to='/chat' />
-  )
-  return (
-    <Route
-      {...rest}
-      render={(props) => authenticated === false
-        ? <Component {...props} />
-        : <Navigate to='/chat' />}
-    />
-  )
-}
-
-class App extends Component {
-  constructor() {
-    super();
-    this.state = {
-      authenticated: false,
-      loading: true,
-    };
-  }
-
-  componentDidMount() {
-    auth.onAuthStateChanged((user) => {
-      if (!user) {
-        this.setState({
-          authenticated: false,
-          loading: false,
-        });
-      } else {
-        this.setState({
-          authenticated: true,
-          loading: false,
-        });
-      }
-    })
-  }
-
-
-  render() {
-    return this.state.loading === true ? <h2>Loading...</h2> : (
-      <div className="container">
-        <Router>
-          <Routes>
-            <Route exact path="/" element={<Main/>}></Route>
-
-            <Route exact path='/chat'
-            element={<PrivateRoute authenticated={this.state.authenticated} component={Chatter}></PrivateRoute>}>
-            </Route>
-
-            <Route exact path='/signup'
-            element={<PublicRoute  authenticated={this.state.authenticated} component={SignUp}></PublicRoute>}>
-          </Route>
-
-          <Route exact path='/login' element={<PublicRoute  authenticated={this.state.authenticated} component={Login}></PublicRoute>}>
-            
-          </Route>
-            
+    <div className="App">
+      <header>
+        <h1>{user ? user.displayName : " no hay usuairo"}</h1>
+        <><SignOut/></>
         
-          </Routes>
-        </Router>
-      </div>
+      </header>
 
-    );
-  }
+      <section>
+        {user ? <ChatRoom/>:<SignIn/>}
+      </section>
+    </div>
+  );
+}
+
+function SignUp() {
 
 }
+
+function SignIn() {
+  const signInWithGoogle = () => {
+    console.log(auth)
+    const provider = new firebase.auth.GoogleAuthProvider();
+    auth.signInWithPopup(provider);
+  }
+
+  return(
+
+      <button onClick={signInWithGoogle}>Sign in with Google</button>
+  )
+}
+
+function SignOut() {
+  return auth.currentUser && (
+    <button className="sign-out" onClick={() => auth.signOut()}>Sign Out</button>
+  )
+}
+
+function ChatMessage(props) {
+  const { text, uid, photoURL } = props.message;
+
+  const messageClass = uid === auth.currentUser.uid ? 'sent' : 'received';
+
+  return (
+  <div>
+    <div className={`message ${messageClass}`}>
+      <img alt='imagenProfile' src={photoURL || 'https://user-images.githubusercontent.com/59320487/163134225-4cc380aa-5f12-4e00-8409-c64218e1a183.png'} />
+      <p>{text}</p>
+    </div>
+  </div>
+  )
+}
+
+function ChatRoom() {
+  const dummy = useRef();
+  const messagesRef = firestore.collection('messages');
+  const query = messagesRef.orderBy('createdAt').limit(25);
+
+  const [messages] = useCollectionData(query, { idField: 'id' });
+
+  const [formValue, setFormValue] = useState('');
+
+
+  const sendMessage = async (e) => {
+    e.preventDefault();
+
+    const { uid, photoURL } = auth.currentUser;
+
+    await messagesRef.add({
+      text: formValue,
+      createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+      uid,
+      photoURL
+    })
+
+    setFormValue('');
+    dummy.current.scrollIntoView({ behavior: 'smooth' });
+  }
+
+  return (
+  <div>
+    <main>
+
+      {messages && messages.map(msg => <ChatMessage key={msg.id} message={msg} />)}
+
+      <span ref={dummy}></span>
+
+    </main>
+
+    <form onSubmit={sendMessage}>
+
+      <input value={formValue} onChange={(e) => setFormValue(e.target.value)} placeholder="say something nice" />
+
+      <button type="submit" disabled={!formValue}>submit</button>
+
+    </form>
+  </div>
+  )
+}
+
+
 
 export default App;
+

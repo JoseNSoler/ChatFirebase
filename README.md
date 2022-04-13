@@ -1,7 +1,18 @@
-# Getting Started with Create React App
+# Chat firebase
+
+<p align="center">
+<img src="https://www.sofka.com.co/wp-content/uploads/2021/02/sofkau-logo-horizontal.png">
+</p>
+
+<p align="center">
+<img src="https://user-images.githubusercontent.com/59320487/163153580-a009d465-2aa3-401c-96b0-0a917ac3749b.png">
+</p>
 
 
-##
+
+
+
+## Aplicacion para chat 
 
 In the project directory, you can run:
 
