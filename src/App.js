@@ -4,9 +4,14 @@ import './App.css';
 import { useAuthState } from 'react-firebase-hooks/auth';
 import { useCollectionData } from 'react-firebase-hooks/firestore';
 
+import { Jumbotron, Button, Form, Col } from 'react-bootstrap';
+
 import firebase from 'firebase/compat/app';
 import 'firebase/compat/auth';
 import 'firebase/compat/firestore';
+import { createUserWithEmailAndPassword } from 'firebase/auth';
+
+
 
 
 const firebaseConfig = {
@@ -55,20 +60,99 @@ function App() {
   );
 }
 
-function SignUp() {
 
+function SignUp() {
+  const [email, setemail] = useState("");
+  const [pass, setpass] = useState("");
+  
+
+  const  handleSubmit = (event) => {
+    event.preventDefault();
+
+    createUserWithEmailAndPassword(auth, email, pass)
+    .then((userCredential) => {
+      // Signed in
+      const user = userCredential.user;
+      console.log("awsdasdsdsdsdsdsdsd")
+      // ...
+    })
+    .catch((error) => {
+      const errorCode = error.code;
+      const errorMessage = error.message;
+      // ..
+    });
+
+  }
+
+
+  const handleChange = (event) => {
+    switch (event.target.name) {
+      case "email":
+        setemail(event.target.value)
+        break;
+      case "password":
+        setpass(event.target.value)
+        break;
+      default:
+        break;
+    }
+  }
+
+  return(
+    <div>
+    <Form onSubmit={handleSubmit} style={{ height: "359px" }}>
+                            <div className="form-input">
+                                <Form.Group>
+                                    <h1>Registrate en ChatLine
+                                    </h1>
+                                    <p>Ingresa tus datos para crear tu cuenta.</p>
+                                </Form.Group>
+
+                                <Form.Group>
+                                    <Col sm={7}>
+                                        <Form.Control id="form-input" placeholder="Email" name="email" type="email" onChange={(e) => {handleChange(e)}} value={email} required />
+                                    </Col>
+                                </Form.Group>
+
+                                <Form.Group>
+                                    <Col sm={7}>
+                                        <Form.Control id="form-input" placeholder="Password" name="password" onChange={(e) => {handleChange(e)}} value={pass} type="password" required/>
+                                    </Col>
+
+                                </Form.Group>
+                            </div>
+                                    <Button type="submit" className='buttonRegister'>Registrate</Button>
+                            <br />
+                        </Form>
+            </div>
+  )
 }
 
 function SignIn() {
+
+
   const signInWithGoogle = () => {
     console.log(auth)
     const provider = new firebase.auth.GoogleAuthProvider();
     auth.signInWithPopup(provider);
   }
 
-  return(
+  const signInWithGithub = () => {
+    console.log(auth)
+    const provider = new firebase.auth.GithubAuthProvider();
+    auth.signInWithPopup(provider);
+  }
 
+
+
+  return(<>
+      <button onClick={signInWithGithub}>Sign in with Github</button>
       <button onClick={signInWithGoogle}>Sign in with Google</button>
+      <>No tienes usuario?</>
+      <SignUp/>
+      
+      </>
+
   )
 }
 
